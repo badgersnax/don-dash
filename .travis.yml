@@ -3,11 +3,15 @@ services:
 - docker
 before_install:
 - docker build -t $DOCKER_IMAGE .
+after_success:
+- docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSWORD
+- docker push $DOCKER_IMAGE
 script:
 - docker run -it --rm $DOCKER_IMAGE py.test
+- docker run -it --rm -e HALO_API_KEY=$HALO_API_KEY -e HALO_API_SECRET_KEY=$HALO_API_SECRET_KEY -e HALO_API_HOSTNAME=$HALO_API_HOSTNAME -e HALO_API_PORT=$HALO_API_PORT -e HALO_AGENT_KEY=$HALO_AGENT_KEY -e SERVER_GROUP=$SERVER_GROUP $DOCKER_IMAGE /app/scan_with_halo.sh
 env:
   global:
-  - SERVER_GROUP=demo_group
+  - SERVER_GROUP=dondash
   - HALO_API_HOSTNAME=api.cloudpassage.com
   - HALO_API_PORT=443
-  - DOCKER_IMAGE="awilson/don-dash:latest"
+  - DOCKER_IMAGE="berretterry/dondash:latest"
